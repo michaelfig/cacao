@@ -1,23 +1,28 @@
-# Cacao - Client Access-Control-Allow-Origin
+# Cacao - CORS Access-Control-Allow-Origin
 
-Cacao is a Cross-Origin (CORS) proxy.  It allows Javascript running in a web browser to access a remote HTTP resource without cross-origin restrictions.  It works by proxying requests to a remote server, and adding the `Access-Control-Allow-Origin: *` header to the returned result.
+Cacao is a Cross-Origin (CORS) proxy.  It allows Javascript running in a web browser to access a remote HTTP resource without cross-origin restrictions.  It has several different implementations, and works by adding the `Access-Control-Allow-Origin: *` header to an HTTP response.
 
 ## IP Camera Streaming
 
-The main use case is to access a remote streaming MJPEG URL published by an IP Camera, via an `<img>` tag pointing to a local Cacao proxy.  Without Cacao, this image data is marked as cross-origin, and therefore cannot be used as the source for a WebRTC stream.
+The main use case is to access a remote streaming MJPEG URL published by an IP Camera, via an `<img>` tag pointing to Cacao.  Without Cacao, this image data is usually marked as cross-origin, and therefore cannot be used as the source for a WebRTC stream.
 
-With Cacao, the `<img>` can be copied to a `<canvas>` and then since CORS is allowed, sent by the browser via WebRTC.
+With Cacao, the `<img>` can be copied to a `<canvas>` and then (since CORS is allowed) sent by the browser via WebRTC.
 
 TODO: The [Mediasoup Broadcast Example](https://github.com/michaelfig/mediasoup-broadcast-example) will contain an example of using Cacao to make an IP Camera publishable via WebRTC.
 
+TODO: Include other use-cases.
+
 ## Usage
 
-You need to install the [Dart VM](https://www.dartlang.org/tools/sdk#install), then run:
+### Standalone Cacao Proxy
+
+Cacao can be run as a proxy server on Linux (and other Unix-like), MacOS, and Windows.
+
+You need to install the [Dart SDK](https://www.dartlang.org/tools/sdk#install), then run:
 ```
 $ cd bin
 $ cacao --help
 ```
 
-TODO: Create releases of just the Dart VM, Cacao snapshot, and wrapper script for common platforms.  This is written in Dart so that I can create Flutter-based apps for Android and iOS that can act as a local proxy.
 
-Michael FIG <michael+cacao@fig.org>, 2018-12-04
+Michael FIG <michael+cacao@fig.org>, 2018-12-05

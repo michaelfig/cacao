@@ -23,19 +23,26 @@ Future<void> main(List<String> arguments) async {
   
   var argResults = parser.parse(arguments);
   if (argResults[help]) {
-    print('Usage: $progname [OPTION...] BASE-URL\n\n'
-      'Cacao proxies requests via "http://<HOST>:<PORT>/..." to "BASE-URL/..."\n'
+    print('Usage: $progname [OPTION...] PATH=URL...\n\n'
+      'Cacao proxies requests via "http://<HOST>:<PORT>/PATH/..." to "URL/..."\n'
       'adding an "Access-Control-Allow-Origin: *" header to the result.\n\n'
       '${parser.usage}');
     return;
   }
 
   if (argResults.rest.length != 1) {
-    stderr.writeln('$progname: You must specify exactly one BASE-URL');
+    stderr.writeln('$progname: You must specify at least one PATH=URL');
     usage();
     return;
   }
 
-  final baseUrl = argResults.rest[0];
-  await cacao.serve(baseUrl, host: argResults[host], port: int.parse(argResults[port]));
+  final pathMap = new Map<String, String>();
+  final re = new RegExp(r'^((/[^=]*)=)?(.*)$');
+  argResults.rest.forEach((pathUrl) {
+    final match = re.firstMatch(pathUrl);
+    final path = match.group(2);
+    final url = match.group(3);
+    pathMap[path] = url;
+  });
+  await cacao.serve(pathMap, host: argResults[host], port: int.parse(argResults[port]));
 }

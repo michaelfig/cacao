@@ -1,6 +1,6 @@
 name: cacao
 description: Localhost Cross-Origin (CORS) Proxy
-version: 1.0.0-a2
+version: 1.0.0-a3
 homepage: https://github.com/michaelfig/cacao
 author: Michael FIG <michael+cacao@fig.org>
 

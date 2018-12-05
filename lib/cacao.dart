@@ -3,9 +3,39 @@ import 'dart:io';
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8997;
 
-Uri findUri(Uri requested, String baseUrl) {
-  return Uri.parse(baseUrl + requested.path +
-    (requested.hasQuery ? '?${requested.query}' : ''));
+String buildQuery(String a, String b) {
+  final prefix = (a.isEmpty && b.isEmpty) ? '' : '?';
+  final sep = (a.isNotEmpty && b.isNotEmpty) ? '&' : '';
+  return prefix + a + sep + b;
+}
+
+Uri findUri(Uri requested, Map<String, String> pathMap) {
+  // Use the longest matching pathMap.
+  final segs = requested.pathSegments;
+  var toAdd = '';
+  for (var i = segs.length; i >= 0; --i) {
+    final toMatch = '/' + segs.take(i).join('/');
+    final toPrepend = pathMap[toMatch];
+    if (toPrepend != null) {
+      final pre = Uri.parse(toPrepend);
+      toAdd = segs
+        .skip(i)
+        .map((s) => Uri.encodeComponent(s))
+        .join('/');
+      final sep = i == segs.length ? '' : '/';
+      final addQuery = buildQuery(pre.query, requested.query);
+      return pre.resolve(pre.origin + pre.path + sep + toAdd + addQuery);
+    }
+  }
+  // Do the default mapping, if there is one.
+  final defaultUrl = pathMap[''];
+  if (defaultUrl == null) {
+    throw 'No default Url in pathMap';
+  }
+  final pre = Uri.parse(defaultUrl);
+  final addQuery = buildQuery(pre.query, requested.query);
+  final rpath = pre.path.endsWith('/') && requested.path.startsWith('/') ?    requested.path.substring(1) : requested.path;
+  return pre.resolve(pre.origin + pre.path + rpath + addQuery);
 }
 
 void doProxy(HttpRequest request, Uri uri) {
@@ -45,13 +75,13 @@ void doProxy(HttpRequest request, Uri uri) {
       });
 }
 
-Future<void> serve(String baseUrl, {host: DEFAULT_HOST, port: DEFAULT_PORT}) async {
-  print('Listening for $baseUrl on http://$host:$port/');
+Future<void> serve(Map<String, String> pathMap, {host: DEFAULT_HOST, port: DEFAULT_PORT}) async {
+  print('Listening on http://$host:$port/');
   final server = await HttpServer.bind(host, port);
   await for (HttpRequest request in server) {
     try {
-      final uri = findUri(request.requestedUri, baseUrl);
-      print('Request for $uri');
+      final uri = findUri(request.requestedUri, pathMap);
+      print('${request.requestedUri} -> $uri');
       doProxy(request, uri);
     }
     catch (e) {
