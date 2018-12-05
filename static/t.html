@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head><title>Foo</title></head>
+    <body>
+        <canvas id="c"></canvas>
+        <img id="i" src="/mjpeg"/>
+        <video id="v" autoplay playsinline/>
+
+    <script type="text/javascript">
+    var ctx = c.getContext('2d');
+    function drawImage() {
+        ctx.drawImage(i, 0, 0);
+        requestAnimationFrame(drawImage);
+    }
+    i.onload = function () {
+        c.height = i.height;
+        c.width = i.width;
+        drawImage();
+        var stream = c.captureStream(15);
+        whenStreamIsActive(stream, setSrc);
+        function setSrc() {
+            console.log('setting active video stream');
+            video.srcObject = stream;
+        }
+    };
+    v.srcObject = c.captureStream(15);
+
+    var streamActiveTimeout = {};
+function whenStreamIsActive(stream, callback) {
+    var id = stream.id;
+    if (stream.active) {
+        callback();
+    }
+    else if ('onactive' in stream) {
+        stream.onactive = maybeCallback;
+    }
+    else if (!streamActiveTimeout[id]) {
+        maybeCallback();
+    }
+    function maybeCallback() {
+        delete streamActiveTimeout[id];
+        if (stream.onactive === maybeCallback) {
+            stream.onactive = null;
+        }
+        if (!stream.active) {
+            // Safari needs a timeout to try again.
+            // console.log('try again');
+            streamActiveTimeout[id] = setTimeout(maybeCallback, 500);
+            return;
+        }
+        callback();
+    }
+}
+    </script>
+    </body>
+
+</html>

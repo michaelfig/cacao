@@ -99,12 +99,18 @@ Future<void> serve(Map<String, String> pathMap, {host: DEFAULT_HOST, port: DEFAU
     try {
       final uri = findUri(request.requestedUri, pathMap);
       print('${request.requestedUri} -> $uri');
-      doProxy(request, uri);
+      if (uri.scheme == 'file') {
+        throw 'FIXME: Serve static file from $uri';
+      }
+      else {
+        doProxy(request, uri);
+      }
     }
     catch (e) {
       print('Got an error $e');
       request.response.statusCode = 500;
       request.response.writeln('Cacao server error');
+      request.response.close();
     }
   }
 }
