@@ -9,10 +9,10 @@ void main() {
 
   test('findUri', () {
     final baseUrl = 'http://www.example.org/hello';
-    final pathMap = {'': baseUrl};
+    final pathMap = {null: baseUrl};
 
     Uri req = Uri.parse('http://localhost:8393/');
-    expect(findUri(req, pathMap).toString(), baseUrl + '/');
+    expect(findUri(req, pathMap).toString(), baseUrl);
 
     Uri req2 = Uri.parse('http://localhost:8329');
     expect(findUri(req2, pathMap).toString(), baseUrl);
@@ -30,7 +30,7 @@ void main() {
       '/path/sub': 'http://a.example.com/foo',
       '/path': 'http://a.example.com/default',
       '/path2': 'http://b.example.com',
-      '': 'http://example.com',
+      null: 'http://example.com',
     };
 
     Uri req = Uri.parse('http://localhost:3939');
@@ -55,7 +55,7 @@ void main() {
 
   test('findUri query string', () {
     final pathMap = {
-      '': 'http://example.com/?foo=bar&baz',
+      null: 'http://example.com/?foo=bar&baz',
     };
 
     Uri req = Uri.parse('http://localhost:8929');
@@ -63,5 +63,12 @@ void main() {
 
     Uri req2 = Uri.parse('http://localhost:2989/path2/sub2');
     expect(findUri(req2, pathMap).toString(), 'http://example.com/path2/sub2?foo=bar&baz');
+
+    final pathMap2 = {
+      null: 'http://example.com/foo/index.cgi?foo=bar',
+    };
+
+    Uri req3 = Uri.parse('http://localhost:9000');
+    expect(findUri(req3, pathMap2).toString(), 'http://example.com/foo/index.cgi?foo=bar');
   });
 }
