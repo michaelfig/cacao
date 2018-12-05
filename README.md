@@ -18,6 +18,6 @@ $ cd bin
 $ cacao --help
 ```
 
-TODO: Create releases of just the Dart VM, Cacao snapshot, and wrapper script for common platforms.
+TODO: Create releases of just the Dart VM, Cacao snapshot, and wrapper script for common platforms.  This is written in Dart so that I can create Flutter-based apps for Android and iOS that can act as a local proxy.
 
 Michael FIG <michael+cacao@fig.org>, 2018-12-04
