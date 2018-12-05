@@ -4,8 +4,17 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "Dart",
+            "name": "Cacao Google",
+            "program": "bin/cacao.dart",
+            "args": ["-p", "9000", "http://www.google.ca"],
+            "request": "launch",
+            "type": "dart"
+        },
+
+        {
+            "name": "Cacao MJPEG",
             "program": "bin/cacao.dart",
             "args": ["-p", "9000", "http://webcams.hotelcozumel.com.mx:6012/axis-cgi/mjpg/video.cgi?resolution=320x240"],
             "request": "launch",
