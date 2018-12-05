@@ -1,0 +1,2 @@
+#! /bin/sh
+exec dart `dirname "$0"`/cacao.dart ${1+"$@"}

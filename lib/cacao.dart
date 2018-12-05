@@ -3,13 +3,13 @@ import 'dart:io';
 const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8997;
 
+Uri findUri(Uri requested, String baseUrl) {
+  return Uri.parse(baseUrl + requested.path +
+    (requested.hasQuery ? '?${requested.query}' : ''));
+}
 
-void doProxy(HttpRequest request, String baseUrl) {
+void doProxy(HttpRequest request, Uri uri) {
   // Proxy the request.
-  final requri = request.requestedUri;
-  final uri = Uri.parse(baseUrl + requri.path +
-    (requri.hasQuery ? '?${requri.query}' : ''));
-  print('Request for $uri');
   new HttpClient()
     ..openUrl(request.method, uri)
       .then((HttpClientRequest targetRequest) async {
@@ -50,7 +50,9 @@ Future<void> serve(String baseUrl, {host: DEFAULT_HOST, port: DEFAULT_PORT}) asy
   final server = await HttpServer.bind(host, port);
   await for (HttpRequest request in server) {
     try {
-      doProxy(request, baseUrl);
+      final uri = findUri(request.requestedUri, baseUrl);
+      print('Request for $uri');
+      doProxy(request, uri);
     }
     catch (e) {
       print('Got an error $e');
