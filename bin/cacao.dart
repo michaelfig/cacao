@@ -1,4 +1,4 @@
-import 'package:cacao/cacao_serve.dart' as cacao;
+import 'package:cacao/cacao_io.dart' as cacao_io;
 import 'package:args/args.dart';
 import 'dart:io';
 //import 'dart:convert';
@@ -17,9 +17,9 @@ Future<void> main(List<String> arguments) async {
   final parser = new ArgParser()
     ..addFlag(help, negatable: false,
       help: 'display this message and exit')
-    ..addOption(host, abbr: 'h', defaultsTo: cacao.DEFAULT_HOST,
+    ..addOption(host, abbr: 'h', defaultsTo: cacao_io.DEFAULT_HOST,
       help: 'local address to bind to', valueHelp: 'HOST')
-    ..addOption(port, abbr: 'p', defaultsTo: cacao.DEFAULT_PORT.toString(),
+    ..addOption(port, abbr: 'p', defaultsTo: cacao_io.DEFAULT_PORT.toString(),
       help: 'local port to bind to', valueHelp: 'PORT');
   
   var argResults = parser.parse(arguments);
@@ -45,5 +45,5 @@ Future<void> main(List<String> arguments) async {
     final url = match.group(3);
     pathMap[path] = url;
   });
-  await cacao.serve(pathMap, cacao.DEFAULT_SCHEME_MAP, host: argResults[host], port: int.parse(argResults[port]));
+  await cacao_io.serve(pathMap, cacao_io.DEFAULT_SCHEME_MAP, host: argResults[host], port: int.parse(argResults[port]));
 }
