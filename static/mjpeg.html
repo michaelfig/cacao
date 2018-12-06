@@ -3,12 +3,12 @@
     <head><title>Cacao - MJPEG to MediaStream</title></head>
     <body>
         <h1>Cacao - MJPEG to MediaStream</h1>
-        <p>First, run "cacao -p9000 SOME-MJPEG-URL".  Then click
+        <p>First, run "cacao -p9000 /mjpeg=SOME-MJPEG-URL".  Then click
             <button onclick="go()">Go</button>.  You should see the image, canvas, and video all populate.
         </p>
         <table>
             <tr><th>Image</th> <td><img id="i" crossorigin /></td></tr>
-            <tr><th>Video</th> <td><video id="v" autoplay playsinline/></td></tr>
+            <tr><th>Video</th> <td><video id="v" autoplay playsinline /></td></tr>
             <tr><th>Canvas</th> <td><canvas id="c"></canvas></td></tr>
         </table>
 
@@ -36,7 +36,7 @@
     };
 
     function go() {
-        i.src = "http://localhost:9000";
+        i.src = "http://localhost:9000/mjpeg";
     }
 
     var streamActiveTimeout = {};

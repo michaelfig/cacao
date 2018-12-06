@@ -1,6 +1,7 @@
 import 'package:cacao/cacao.dart' as cacao;
 import 'package:args/args.dart';
 import 'dart:io';
+//import 'dart:convert';
 
 const port = 'port';
 const host = 'host';
@@ -30,7 +31,7 @@ Future<void> main(List<String> arguments) async {
     return;
   }
 
-  if (argResults.rest.length != 1) {
+  if (argResults.rest.length == 0) {
     stderr.writeln('$progname: You must specify at least one PATH=URL');
     usage();
     return;
