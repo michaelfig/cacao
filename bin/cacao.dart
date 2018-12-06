@@ -1,4 +1,4 @@
-import 'package:cacao/cacao.dart' as cacao;
+import 'package:cacao/cacao_serve.dart' as cacao;
 import 'package:args/args.dart';
 import 'dart:io';
 //import 'dart:convert';
@@ -38,12 +38,12 @@ Future<void> main(List<String> arguments) async {
   }
 
   final pathMap = new Map<String, String>();
-  final re = new RegExp(r'^((/[^=]*)=)?(.*)$');
+  final re = new RegExp(r'^((/[^:=]*)=)?(.*)$');
   argResults.rest.forEach((pathUrl) {
     final match = re.firstMatch(pathUrl);
     final path = match.group(2);
     final url = match.group(3);
     pathMap[path] = url;
   });
-  await cacao.serve(pathMap, host: argResults[host], port: int.parse(argResults[port]));
+  await cacao.serve(pathMap, cacao.DEFAULT_SCHEME_MAP, host: argResults[host], port: int.parse(argResults[port]));
 }

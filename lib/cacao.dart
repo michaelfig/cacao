@@ -1,3 +1,3 @@
-export "src/serve.dart";
-export "src/findUri.dart";
-export "src/defaults.dart";
+export 'src/findUri.dart';
+export 'src/defaults.dart';
+export 'src/serve.dart';
