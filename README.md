@@ -1,6 +1,6 @@
-# Cacao - CORS Access-Control-Allow-Origin
+# Cacao Proxy - CORS Access-Control-Allow-Origin Proxy
 
-Cacao is a Cross-Origin (CORS) proxy.  It allows Javascript running in a web browser to access a remote HTTP resource without cross-origin restrictions.  It has several different implementations, and works by adding the `Access-Control-Allow-Origin: *` header to an HTTP response.
+Cacao is a Cross-Origin (CORS) proxy.  It allows Javascript running in a web browser to access a remote HTTP resource without cross-origin restrictions.  It runs on several different platforms, and essentially works by adding a `Access-Control-Allow-Origin: *` header to an HTTP response.
 
 ## IP Camera Streaming
 
