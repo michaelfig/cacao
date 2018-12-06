@@ -9,6 +9,8 @@ environment:
 
 dependencies:
   args: ^1.5.1
+  mime: ^0.9.6+2
+  #  path: ^1.4.1
 
 dev_dependencies:
   archive: ^2.0.0

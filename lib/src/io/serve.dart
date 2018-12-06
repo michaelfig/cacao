@@ -6,9 +6,15 @@ Future<void> serve(HttpServer server, Map<String, String> pathMap, Map<String, C
   await for (HttpRequest request in server) {
     final onError = (e) {
       print('Got an error $e');
-      request.response.statusCode = 500;
-      request.response.writeln('Cacao server error');
-      request.response.close();
+      try {
+        request.response.statusCode = 500;
+        request.response.writeln('Cacao server error');
+      }
+      catch (_) {}
+      try {
+        request.response.close();
+      }
+      catch (_) {}
     };
     try {
       final uri = findUri(request.requestedUri, pathMap);
