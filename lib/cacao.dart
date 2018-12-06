@@ -83,12 +83,16 @@ void doProxy(HttpRequest request, Uri uri) {
         // Do the magic: add the allow origin.
         request.response.headers.set('Access-Control-Allow-Origin', '*');
         
-        request.response
-          // Send the proxy response stream.
-          ..bufferOutput = false
-          ..addStream(targetResponse)
-          // Close the response after it is complete.
-          .then((dynamic) => request.response.close());
+        // Send the proxy response stream.
+        final subscription = targetResponse.listen(
+          (event) => request.response.add(event),
+          onDone: () => request.response.close()
+        );
+        
+        request.response.done.then((_) {
+          // print('Client closed');
+          subscription.cancel();
+        });
       });
 }
 
@@ -99,12 +103,7 @@ Future<void> serve(Map<String, String> pathMap, {host: DEFAULT_HOST, port: DEFAU
     try {
       final uri = findUri(request.requestedUri, pathMap);
       print('${request.requestedUri} -> $uri');
-      if (uri.scheme == 'file') {
-        throw 'FIXME: Serve static file from $uri';
-      }
-      else {
-        doProxy(request, uri);
-      }
+      doProxy(request, uri);
     }
     catch (e) {
       print('Got an error $e');
