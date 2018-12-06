@@ -1,5 +1,5 @@
-import 'findUri.dart';
-import 'defaults.dart';
+import '../findUri.dart';
+import '../defaults.dart';
 import 'dart:io';
 
 Future<void> serve(Map<String, String> pathMap, Map<String, Function> schemeMap, {
