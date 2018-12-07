@@ -1,14 +1,14 @@
 name: cacao
 description: CORS Access-Control-Allow-Origin Proxy
-version: 0.2.0
+version: 0.3.0-dev.1
 homepage: https://github.com/michaelfig/cacao
 author: Michael FIG <michael+cacao@fig.org>
 
 environment:
   sdk: '>=2.1.0-dev <3.0.0'
 
-#dependencies:
-#  path: ^1.4.1
+dependencies:
+  args: ^1.5.1
 
 dev_dependencies:
   test: ^1.0.0

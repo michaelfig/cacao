@@ -1,14 +1,8 @@
 import '../findUri.dart';
-import '../defaults.dart';
 import 'types.dart';
 import 'dart:io';
 
-Future<void> serve(Map<String, String> pathMap, Map<String, CacaoServer> schemeMap, {
-  host: DEFAULT_HOST,
-  port: DEFAULT_PORT,
-}) async {
-  print('Listening on http://$host:$port/');
-  final server = await HttpServer.bind(host, port);
+Future<void> serve(HttpServer server, Map<String, String> pathMap, Map<String, CacaoServer> schemeMap) async {
   await for (HttpRequest request in server) {
     final onError = (e) {
       print('Got an error $e');

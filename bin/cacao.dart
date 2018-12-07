@@ -59,5 +59,11 @@ ${parser.usage}''');
     usage();
     return;
   }
-  await cacao_io.serve(pathMap, cacao_io.DEFAULT_SCHEME_MAP, host: argResults[host], port: int.parse(argResults[port]));
+
+  final h = argResults[host];
+  final p = int.parse(argResults[port]);
+  print('Listening on http://$h:$p/');
+  final server = await HttpServer.bind(h, p);
+
+  await cacao_io.serve(server, pathMap, cacao_io.DEFAULT_SCHEME_MAP);
 }
