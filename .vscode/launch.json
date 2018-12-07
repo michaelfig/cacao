@@ -11,7 +11,7 @@
                 "http://www.google.ca",
                 "/stewart=file:///Users/stewart/cacao/static",
                 "/michael=file:///Users/michael/src/cacao/static",
-                "/mjpeg=http://webcams.hotelcozumel.com.mx:6012/axis-cgi/mjpg/video.cgi?resolution=320x240"],
+                "/mjpeg=http://oviso.axiscam.net/axis-cgi/mjpg/video.cgi"],
             "request": "launch",
             "type": "dart"
         }

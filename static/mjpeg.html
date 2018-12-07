@@ -4,67 +4,131 @@
     <body>
         <h1>Cacao - MJPEG to MediaStream</h1>
         <p>First, run "cacao -p9000 /mjpeg=SOME-MJPEG-URL".  Then click
-            <button onclick="go()">Go</button>.  After a few seconds, you should see the image, canvas, and video all populate and synchronize.
+            <button onclick="go('http://localhost:9000/mjpeg')">Go</button>.  After a few seconds, you should see the image, canvas, and video all populate and synchronize.
         </p>
         <table>
-            <tr><th>Image</th> <td><img id="i" crossorigin /></td></tr>
-            <tr><th>Video</th> <td><video id="v" autoplay playsinline /></td></tr>
-            <tr><th>Canvas</th> <td><canvas id="c"></canvas></td></tr>
+            <tr><th>Video</th> <td><video id="video" autoplay playsinline /></td></tr>
+            <tr><th>Image</th> <td><img id="image"/></td></tr>
+            <tr><th>Canvas</th> <td><canvas id="canvas"></canvas></td></tr>
         </table>
 
     <script type="text/javascript">
-    var ctx = c.getContext('2d');
-    function drawImage() {
-        ctx.drawImage(i, 0, 0);
-    }
-    function drawImageRAF() {
-        drawImage();
-        requestAnimationFrame(drawImageRAF);
-    }
-    i.onload = function () {
-        i.onload = null;
-        c.height = i.naturalHeight;
-        c.width = i.naturalWidth;
-        // setInterval(drawImage, 500);
-        drawImageRAF();
-        var stream = c.captureStream();
-        whenStreamIsActive(stream, setSrc);
-        function setSrc() {
-            console.log('setting active video stream');
-            v.srcObject = stream;
-        }
-    };
+    var ctx = canvas.getContext('2d');
 
-    function go() {
-        i.src = "http://localhost:9000/mjpeg";
+    var TYPE_JPEG = 'image/jpeg';
+    function go(url) {
+        fetch(url, {mode: 'cors'})
+        .then(function fetchComplete(response) {
+            if (!response.ok) {
+                throw Error(response.status+' '+response.statusText)
+            }
+            if (!response.body) {
+                alert('ReadableStream not supported.\n' +
+                  'If you are using Firefox, go to about:config and set:\n' +
+                  'dom.streams.enabled and javascript.options.streams');
+                throw Error('ReadableStream not yet supported in this browser.')
+            }
+            
+            var stream = canvas.captureStream();
+            whenStreamIsActive(stream, setSrc);
+            function setSrc() {
+                console.log('setting active video stream');
+                video.srcObject = stream;
+            }
+
+            var reader = response.body.getReader();
+            var headers = '';
+            var contentLength = -1;
+            var imageBuffer = null;
+            var bytesRead = 0;
+            
+            function pushRead() {
+                reader.read().then(function readChunk(attrs) {
+                    if (attrs.done) {
+                        console.log('Try to close controller');
+                        controller.close();
+                        return;
+                    }
+
+                    var value = attrs.value;
+                    for (let index =0; index < value.length; index++) {
+                        
+                        // we've found start of the frame. Everything we've read till now is the header.
+                        if (value[index] === 0xff && value[index+1] === 0xd8) {
+                            // console.log('header found : ' + newHeader);
+                            contentLength = getLength(headers);
+                            // console.log("Content Length : " + newContentLength);
+                            imageBuffer = new Uint8Array(new ArrayBuffer(contentLength));
+                        }
+                        // we're still reading the header.
+                        if (contentLength <= 0) {
+                            headers += String.fromCharCode(value[index]);
+                        }
+                        // we're now reading the jpeg. 
+                        else if (bytesRead < contentLength){
+                            imageBuffer[bytesRead++] = value[index];
+                        }
+                        // we're done reading the jpeg. Time to render it. 
+                        else {
+                            // console.log("jpeg read with bytes : " + bytesRead);
+                            image.src = URL.createObjectURL(new Blob([imageBuffer], {type: TYPE_JPEG}));
+                            image.onload = function imgLoad() {
+                                image.onload = null;
+                                canvas.height = image.naturalHeight;
+                                canvas.width = image.naturalWidth;
+                                ctx.drawImage(image, 0, 0);
+                            };
+                            contentLength = 0;
+                            bytesRead = 0;
+                            headers = '';
+                        }
+                    }
+                    pushRead();
+                }).catch(function onError(error) {
+                    console.error(error);
+                })
+            }
+                    
+            pushRead();
+        }).catch(function onError(error) {
+            console.error(error);
+        });
+    }
+
+    function getLength(headers) {
+        var match = headers.match(/^content-length: *(\d+)$/mi);
+        if (match) {
+            return parseInt(match[1], 10);
+        }
+        return -1;
     }
 
     var streamActiveTimeout = {};
-function whenStreamIsActive(stream, callback) {
-    var id = stream.id;
-    if (stream.active) {
-        callback();
-    }
-    else if ('onactive' in stream) {
-        stream.onactive = maybeCallback;
-    }
-    else if (!streamActiveTimeout[id]) {
-        maybeCallback();
-    }
-    function maybeCallback() {
-        delete streamActiveTimeout[id];
-        if (stream.onactive === maybeCallback) {
-            stream.onactive = null;
+    function whenStreamIsActive(stream, callback) {
+        var id = stream.id;
+        if (stream.active) {
+            callback();
         }
-        if (!stream.active) {
-            // Safari needs a timeout to try again.
-            // console.log('try again');
-            streamActiveTimeout[id] = setTimeout(maybeCallback, 500);
-            return;
+        else if ('onactive' in stream) {
+            stream.onactive = maybeCallback;
         }
-        callback();
+        else if (!streamActiveTimeout[id]) {
+            maybeCallback();
+        }
+        function maybeCallback() {
+            delete streamActiveTimeout[id];
+            if (stream.onactive === maybeCallback) {
+                stream.onactive = null;
+            }
+            if (!stream.active) {
+                // Safari needs a timeout to try again.
+                // console.log('try again');
+                streamActiveTimeout[id] = setTimeout(maybeCallback, 500);
+                return;
+            }
+            callback();
+        }
     }
-}
     </script>
     </body>
 
