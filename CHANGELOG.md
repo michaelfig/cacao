@@ -1,6 +1,7 @@
 ## 0.3.1
 
 - Fix HTTP proxy connection leak.
+- Improve file proxy error messages.
 - Get mjpeg.html working on Firefox and Chrome without relying on nonstandard behaviour.
 
 ## 0.3.0
