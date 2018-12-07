@@ -4,6 +4,9 @@ Future<void> serveHttp(HttpRequest request, Uri uri) async {
   // Proxy the request.
   final client = new HttpClient();
   final targetRequest = await client.openUrl(request.method, uri);
+  bool clientClosed = false;
+  request.response.done
+    .then((_) => clientClosed = true);
 
   // Add the required headers to the request.
   request.headers.forEach((hdr, val) =>
@@ -23,6 +26,11 @@ Future<void> serveHttp(HttpRequest request, Uri uri) async {
 
   bool sentHeaders = false;
   await for (final event in targetResponse) {
+    if (clientClosed) {
+      final sock = await targetResponse.detachSocket();
+      await sock.close();
+      break;
+    }
     if (!sentHeaders){
       sentHeaders = true;
       request.response.statusCode = targetResponse.statusCode;
@@ -31,6 +39,8 @@ Future<void> serveHttp(HttpRequest request, Uri uri) async {
       request.response.headers.contentType = targetResponse.headers.contentType;
 
       // Do the magic: add the allow origin.
+      request.response.headers.remove('X-Content-Type-Options', 'nosniff');
+      request.response.headers.remove('X-Frame-Options', 'SAMEORIGIN');
       request.response.headers.set('Access-Control-Allow-Origin', '*');
     }
     request.response.add(event);
