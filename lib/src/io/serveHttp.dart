@@ -21,22 +21,20 @@ Future<void> serveHttp(HttpRequest request, Uri uri) async {
 
   final targetResponse = await targetRequest.done;
 
-  // Add the content-type header to the response.
-  request.response.headers.contentType = targetResponse.headers.contentType;
-  request.response.statusCode = targetResponse.statusCode;
+  bool sentHeaders = false;
+  await for (final event in targetResponse) {
+    if (!sentHeaders){
+      sentHeaders = true;
+      request.response.statusCode = targetResponse.statusCode;
 
-  // Do the magic: add the allow origin.
-  request.response.headers.set('Access-Control-Allow-Origin', '*');
-  
-  // Send the proxy response stream.
-  final subscription = targetResponse.listen(
-    (event) => request.response.add(event),
-    onDone: () => request.response.close()
-  );
-      
-  // Cancel the request if we crash.
-  request.response.done.then((_) {
-    // print('Client closed');
-    subscription.cancel();
-  });
+      // Add the content-type header to the response.
+      request.response.headers.contentType = targetResponse.headers.contentType;
+
+      // Do the magic: add the allow origin.
+      request.response.headers.set('Access-Control-Allow-Origin', '*');
+    }
+    request.response.add(event);
+  }
+
+  await request.response.close();
 }
