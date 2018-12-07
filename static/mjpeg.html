@@ -17,6 +17,8 @@
 
     var TYPE_JPEG = 'image/jpeg';
     function go(url) {
+        // This function adapted from: https://github.com/aruntj/mjpeg-readable-stream/blob/master/index.html
+        // MIT License.
         fetch(url, {mode: 'cors'})
         .then(function fetchComplete(response) {
             if (!response.ok) {

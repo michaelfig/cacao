@@ -1,6 +1,6 @@
 name: cacao
 description: Cacao (CORS Access-Control-Allow-Origin) Proxy
-version: 0.3.0
+version: 0.3.1
 homepage: https://github.com/michaelfig/cacao
 author: Michael FIG <michael+cacao@fig.org>
 

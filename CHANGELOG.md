@@ -1,3 +1,8 @@
+## 0.3.1
+
+- Fix HTTP proxy connection leak.
+- Get mjpeg.html working on Firefox and Chrome without relying on nonstandard behaviour.
+
 ## 0.3.0
 
 - Crib `pub run grinder package` from [dart-sass](https://github.com/sass/dart-sass).
