@@ -18,7 +18,7 @@ TODO: Include other use-cases.
 
 Cacao can be run as a proxy server on Linux (and other Unix-like), MacOS, and Windows.
 
-You need to install the [Dart SDK](https://www.dartlang.org/tools/sdk#install), then run:
+You first need to install the [Dart SDK](https://www.dartlang.org/tools/sdk#install), then run:
 ```
 $ cd bin
 $ cacao --help

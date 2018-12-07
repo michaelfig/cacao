@@ -3,9 +3,12 @@ import 'package:args/args.dart';
 import 'dart:io';
 //import 'dart:convert';
 
+const VERSION = '1.0.0';
+
 const port = 'port';
 const host = 'host';
 const help = 'help';
+const version = 'version';
 
 final progname = Platform.script.pathSegments.last;
 
@@ -20,20 +23,25 @@ Future<void> main(List<String> arguments) async {
     ..addOption(host, abbr: 'h', defaultsTo: cacao_io.DEFAULT_HOST,
       help: 'local address to bind to', valueHelp: 'HOST')
     ..addOption(port, abbr: 'p', defaultsTo: cacao_io.DEFAULT_PORT.toString(),
-      help: 'local port to bind to', valueHelp: 'PORT');
+      help: 'local port to bind to', valueHelp: 'PORT')
+    ..addFlag(version, negatable: false,
+      help: 'print version information');
   
   var argResults = parser.parse(arguments);
   if (argResults[help]) {
-    print('Usage: $progname [OPTION...] PATH=URL...\n\n'
-      'Cacao proxies requests via "http://<HOST>:<PORT>/PATH/..." to "URL/..."\n'
-      'adding an "Access-Control-Allow-Origin: *" header to the result.\n\n'
-      '${parser.usage}');
+    print('''
+Usage: $progname [OPTION...] [ROOT-URL] /PATH=URL...
+
+Cacao proxies requests via "http://<HOST>:<PORT>" to <ROOT-URL>
+and "http://<HOST>:<PORT>/<PATH>/..." to "<URL>/...", adding an
+"Access-Control-Allow-Origin: *" header to the result.
+
+${parser.usage}''');
     return;
   }
 
-  if (argResults.rest.length == 0) {
-    stderr.writeln('$progname: You must specify at least one PATH=URL');
-    usage();
+  if (argResults[version]) {
+    print('Cacao Proxy v' + VERSION);
     return;
   }
 
@@ -45,5 +53,11 @@ Future<void> main(List<String> arguments) async {
     final url = match.group(3);
     pathMap[path] = url;
   });
+
+  if (pathMap.isEmpty) {
+    stderr.writeln('$progname: You must specify at least one PATH=URL');
+    usage();
+    return;
+  }
   await cacao_io.serve(pathMap, cacao_io.DEFAULT_SCHEME_MAP, host: argResults[host], port: int.parse(argResults[port]));
 }
