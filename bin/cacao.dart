@@ -3,14 +3,13 @@ import 'package:args/args.dart';
 import 'dart:io';
 //import 'dart:convert';
 
-const VERSION = '0.2.0';
-
 const port = 'port';
 const host = 'host';
 const help = 'help';
 const version = 'version';
 
 final progname = Platform.script.pathSegments.last;
+final VERSION = String.fromEnvironment('version', defaultValue: 'prerelease');
 
 void usage() {
   stderr.write("Type `$progname --help' for more information\n");
@@ -41,7 +40,7 @@ ${parser.usage}''');
   }
 
   if (argResults[version]) {
-    print('Cacao Proxy v' + VERSION);
+    print('Cacao Proxy $VERSION');
     return;
   }
 

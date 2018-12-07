@@ -18,4 +18,4 @@ follow_links() {
 
 # Unlike $0, $BASH_SOURCE points to the absolute path of this file.
 path=`dirname "$(follow_links "$0")"`
-exec dart "$path/cacao.dart" "$@"
+exec "$path/src/dart" "-Dversion=PROJECT_VERSION" "$path/src/PROJECT_NAME.dart.snapshot" "$@"

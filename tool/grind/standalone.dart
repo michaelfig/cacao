@@ -19,7 +19,7 @@ bool get _is64Bit => Platform.version.contains("x64");
 @Task('Build Dart script snapshot.')
 snapshot() {
   ensureBuild();
-  Dart.run('bin/sass.dart', vmArgs: ['--snapshot=build/sass.dart.snapshot']);
+  Dart.run('bin/$project.dart', vmArgs: ['--snapshot=build/$project.dart.snapshot']);
 }
 
 @Task('Build a dev-mode Dart application snapshot.')
@@ -30,21 +30,21 @@ appSnapshot() => _appSnapshot(release: false);
 @Task('Build a release-mode Dart application snapshot.')
 releaseAppSnapshot() => _appSnapshot(release: true);
 
-/// Compiles Sass to an application snapshot.
+/// Compiles project to an application snapshot.
 ///
 /// If [release] is `true`, this compiles in checked mode. Otherwise, it
 /// compiles in unchecked mode.
 void _appSnapshot({@required bool release}) {
   var args = [
-    '--snapshot=build/sass.dart.app.snapshot',
+    '--snapshot=build/$project.dart.app.snapshot',
     '--snapshot-kind=app-jit'
   ];
 
   if (!release) args.add('--enable-asserts');
 
   ensureBuild();
-  Dart.run('bin/sass.dart',
-      arguments: ['tool/app-snapshot-input.scss'], vmArgs: args, quiet: true);
+  Dart.run('bin/$project.dart',
+      arguments: snapshotArgs, vmArgs: args, quiet: true);
 }
 
 @Task('Build standalone packages for all OSes.')
@@ -58,7 +58,7 @@ package() async {
   client.close();
 }
 
-/// Builds a standalone Sass package for the given [os] and architecture.
+/// Builds a standalone project package for the given [os] and architecture.
 ///
 /// The [client] is used to download the corresponding Dart SDK.
 Future _buildPackage(http.Client client, String os, {bool x64 = true}) async {
@@ -86,27 +86,31 @@ Future _buildPackage(http.Client client, String os, {bool x64 = true}) async {
   //
   // TODO: Use an app snapshot everywhere when dart-lang/sdk#28617 is fixed.
   var snapshot = os == Platform.operatingSystem && x64 == _is64Bit
-      ? "build/sass.dart.app.snapshot"
-      : "build/sass.dart.snapshot";
+      ? "build/$project.dart.app.snapshot"
+      : "build/$project.dart.snapshot";
 
   var archive = Archive()
     ..addFile(fileFromBytes(
-        "dart-sass/src/dart${os == 'windows' ? '.exe' : ''}", executable,
+        "$project/src/dart${os == 'windows' ? '.exe' : ''}", executable,
         executable: true))
     ..addFile(
-        file("dart-sass/src/DART_LICENSE", p.join(sdkDir.path, 'LICENSE')))
-    ..addFile(file("dart-sass/src/sass.dart.snapshot", snapshot))
-    ..addFile(file("dart-sass/src/SASS_LICENSE", "LICENSE"))
-    ..addFile(fileFromString(
-        "dart-sass/dart-sass${os == 'windows' ? '.bat' : ''}",
-        readAndReplaceVersion(
-            "package/dart-sass.${os == 'windows' ? 'bat' : 'sh'}"),
-        executable: true))
-    ..addFile(fileFromString("dart-sass/sass${os == 'windows' ? '.bat' : ''}",
-        readAndReplaceVersion("package/sass.${os == 'windows' ? 'bat' : 'sh'}"),
+        file("$project/src/DART_LICENSE", p.join(sdkDir.path, 'LICENSE')))
+    ..addFile(file("$project/src/$program.dart.snapshot", snapshot))
+    ..addFile(file("$project/src/${PROGRAM}_LICENSE", "LICENSE"))
+    ..addFile(fileFromString("$project/$program${os == 'windows' ? '.bat' : ''}",
+        readAndReplaceVersion("package/boot.${os == 'windows' ? 'bat' : 'sh'}"),
         executable: true));
 
-  var prefix = 'build/dart-sass-$version-$os-$architecture';
+  if (new File("package/$project.${os == 'windows' ? 'bat' : 'sh'}").existsSync()) {
+    archive
+      ..addFile(fileFromString(
+        "$project/$project${os == 'windows' ? '.bat' : ''}",
+        readAndReplaceVersion(
+            "package/$project.${os == 'windows' ? 'bat' : 'sh'}"),
+        executable: true));
+  }
+
+  var prefix = 'build/$project-$version-$os-$architecture';
   if (os == 'windows') {
     var output = "$prefix.zip";
     log("Creating $output...");

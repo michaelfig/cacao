@@ -12,9 +12,19 @@ import 'package:path/path.dart' as p;
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart';
 
-/// The version of Dart Sass.
-final String version =
-    loadYaml(File('pubspec.yaml').readAsStringSync())['version'] as String;
+final _yaml = loadYaml(File('pubspec.yaml').readAsStringSync());
+
+/// The name of this project.
+final String project = _yaml['name'] as String;
+
+/// The name of the output program.
+final String program = project.replaceFirst('dart-', '');
+
+/// The name of the output program, capitalized.
+final String PROGRAM = program.toUpperCase();
+
+/// The version of this project.
+final String version = _yaml['version'] as String;
 
 /// The version of the current Dart executable.
 final Version dartVersion = Version.parse(Platform.version.split(" ").first);
@@ -27,6 +37,9 @@ final sassBotEnvironment = RunOptions(environment: {
   "GIT_COMMITTER_EMAIL": "sass.bot.beep.boop@gmail.com"
 });
 
+final List<String> snapshotArgs = [];
+/// final List<String> snapshotArgs = ['tool/app-snapshot-input.scss'];
+
 /// Whether we're using a dev Dart SDK.
 bool get isDevSdk => dartVersion.isPreRelease;
 
@@ -35,10 +48,12 @@ void ensureBuild() {
   Directory('build').createSync(recursive: true);
 }
 
-/// Reads [file], replaces all instances of SASS_VERSION with the actual
+/// Reads [file], replaces all instances of PROJECT_VERSION with the actual
 /// version, and returns its contents.
 String readAndReplaceVersion(String file) =>
-    File(file).readAsStringSync().replaceAll("SASS_VERSION", version);
+    File(file).readAsStringSync()
+    .replaceAll("PROJECT_VERSION", version)
+    .replaceAll("PROJECT_NAME", project);
 
 /// Returns the environment variable named [name], or throws an exception if it
 /// can't be found.
