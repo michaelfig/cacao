@@ -3,7 +3,7 @@ import 'package:args/args.dart';
 import 'dart:io';
 //import 'dart:convert';
 
-const VERSION = '1.0.0';
+const VERSION = '0.2.0';
 
 const port = 'port';
 const host = 'host';

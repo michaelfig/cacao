@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Cacao Dart",
+            "name": "Cacao Server",
             "program": "bin/cacao.dart",
             "args": ["-p", "9000",
                 "/stewart=file:///Users/stewart/cacao/static",
