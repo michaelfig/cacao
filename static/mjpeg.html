@@ -3,15 +3,16 @@
     <head><title>Cacao - MJPEG to MediaStream</title></head>
     <body>
         <h1>Cacao - MJPEG to MediaStream</h1>
-        <p>First, run "cacao -p9000 /mjpeg=SOME-MJPEG-URL".  Then:
+        <p>First, run "cacao -p9000 /mjpeg=SOME-MJPEG-URL".</p>
+        <p>Then:
             <input type="text" id="url" value="/mjpeg" />
-            <button onclick="cancelStream(); go(url.value)">Go</button>
-            <button onclick="cancelStream()">Stop</button>.
+            <button onclick="cancelFetch(); doFetch(url.value)">Go</button>
+            <button onclick="cancelFetch()">Stop</button>.
         </p>
         <p>After a few seconds, you should see the image, canvas, and video all populate and synchronize.
         </p>
         <table>
-            <tr><th>Video</th> <td><video style="background: black" id="video" autoplay playsinline /></td></tr>
+            <tr><th>Video</th> <td><video style="background: black" id="video" autoplay playsinline></video></td></tr>
             <tr><th>Image</th> <td><img id="image"/></td></tr>
             <tr><th>Canvas</th> <td><canvas id="canvas"></canvas></td></tr>
         </table>
@@ -20,15 +21,21 @@
     var ctx = canvas.getContext('2d');
 
     var TYPE_JPEG = 'image/jpeg';
-    function cancelStream() {
+    function cancelFetch() {
         // Do nothing.
     }
 
-    function go(src) {
+    function doFetch(src) {
         // This function adapted from: https://github.com/aruntj/mjpeg-readable-stream/blob/master/index.html
         // MIT License.
         var stopCapture = false;
-        fetch(src, {mode: 'cors'})
+        var controller = window.AbortController && new window.AbortController();
+
+        var fetchFlags = {};
+        if (controller) {
+            fetchFlags.signal = controller.signal;
+        }
+        fetch(src, fetchFlags)
         .then(function fetchComplete(response) {
             if (stopCapture) {
                 return;
@@ -62,12 +69,10 @@
             var contentLength = -1;
             var imageBuffer = null;
             var bytesRead = 0;
-            
+
             function pushRead() {
                 reader.read().then(function readChunk(attrs) {
                     if (attrs.done || stopCapture) {
-                        console.log('Try to close controller');
-                        controller.close();
                         return;
                     }
 
@@ -115,15 +120,18 @@
             console.error(error);
         });
 
-        cancelStream = function doCancelStream() {
+        cancelFetch = function doCancelFetch() {
+            cancelFetch = function doNothing() {};
             video.srcObject = null;
             stopCapture = true;
             image.src = '';
             canvas.height = 0;
             canvas.width = 0;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (controller) {
+                controller.abort();
+            }
         };
-        return cancelStream;
     }
 
     function getLength(headers) {
