@@ -52,6 +52,11 @@ Future<void> serveHttp(HttpRequest request, Uri uri) async {
       // Do the magic: add the allow origin.
       request.response.headers.set('Access-Control-Allow-Origin', '*');
       request.response.headers.set('Cache-Control', 'no-cache');
+      if (false) {
+        for (var hdr in ['X-XSS-Protection', 'X-Content-Type-Options', 'X-Frame-Options']) {
+          request.response.headers.removeAll(hdr);
+        }
+      }
       await request.response.flush();
     }
     request.response.add(event);

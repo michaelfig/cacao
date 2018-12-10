@@ -9,10 +9,12 @@
             "program": "bin/cacao.dart",
             "args": ["-p", "9000",
                 "-h", "0.0.0.0",
-                "http://www.google.ca",
-                "/stewart=file:///Users/stewart/cacao/static",
-                "/michael=file:///Users/michael/src/cacao/static",
-                "/mjpeg=http://216.8.159.21/mjpg/video.mjpg"],
+                "../static",
+                "/mjpeg=http://216.8.159.21/mjpg/video.mjpg",
+                "/cam1=http://192.168.100.1/mjpeg",
+                "/cam2=http://192.168.100.2/-wvhttp-01-/video.cgi",
+                "/cam3=http://root:VB-C300@192.168.100.3/-wvhttp-01-/GetOneShot?frame_count=0",
+                "/cam4=http://192.168.100.4/-wvhttp-01-/video.cgi"],
             "request": "launch",
             "type": "dart"
         }

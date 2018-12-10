@@ -1,5 +1,6 @@
 import 'package:cacao/cacao_io.dart' as cacao_io;
 import 'package:args/args.dart';
+import 'package:path/path.dart' as p;
 import 'dart:io';
 //import 'dart:convert';
 
@@ -50,7 +51,15 @@ ${parser.usage}''');
     final match = re.firstMatch(pathUrl);
     final path = match.group(2);
     final url = match.group(3);
-    pathMap[path] = url;
+    final furl = p.split(url).first;
+    if (furl == '.' || furl == '..') {
+      // Get the path relative to the executing script.
+      final thisdir = p.canonicalize(p.join(p.dirname(Platform.script.path), url));
+      pathMap[path] = Uri.file(thisdir).toString();
+    }
+    else {
+      pathMap[path] = url;
+    }
   });
 
   if (pathMap.isEmpty) {
@@ -59,10 +68,10 @@ ${parser.usage}''');
     return;
   }
 
-  final h = argResults[host];
-  final p = int.parse(argResults[port]);
-  print('Listening on http://$h:$p/');
-  final server = await HttpServer.bind(h, p);
+  final hst = argResults[host];
+  final prt = int.parse(argResults[port]);
+  print('Listening on http://$hst:$prt/');
+  final server = await HttpServer.bind(hst, prt);
 
   await cacao_io.serve(server, pathMap, cacao_io.DEFAULT_SCHEME_MAP);
 }

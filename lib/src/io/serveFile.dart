@@ -1,12 +1,20 @@
 import "dart:io";
 import "dart:async";
 import "package:mime/mime.dart";
+import "package:path/path.dart" as p;
 
 Future<void> serveFile(HttpRequest request, Uri uri) async {
 
   var path = uri.path;
-  if (path.substring(path.length-1) == '/'){
-    path += "index.html";
+  if (await FileSystemEntity.isDirectory(path)) {
+    path = p.join(path, 'index.html');
+  }
+
+  if (!await FileSystemEntity.isFile(path)) {
+    request.response.statusCode = 404;
+    request.response.writeln('Not Found');
+    await request.response.close();
+    return;
   }
   var file = new File(path).openRead();
 
