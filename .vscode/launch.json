@@ -8,10 +8,11 @@
             "name": "Cacao Server",
             "program": "bin/cacao.dart",
             "args": ["-p", "9000",
+                "-h", "0.0.0.0",
                 "http://www.google.ca",
                 "/stewart=file:///Users/stewart/cacao/static",
                 "/michael=file:///Users/michael/src/cacao/static",
-                "/mjpeg=http://oviso.axiscam.net/axis-cgi/mjpg/video.cgi"],
+                "/mjpeg=http://216.8.159.21/mjpg/video.mjpg"],
             "request": "launch",
             "type": "dart"
         }

@@ -3,11 +3,11 @@
     <head><title>Cacao - MJPEG to MediaStream</title></head>
     <body>
         <h1>Cacao - MJPEG to MediaStream</h1>
-        <p>First, run "cacao -p9000 /mjpeg=SOME-MJPEG-URL".  Then click
-            <button onclick="go('http://localhost:9000/mjpeg')">Go</button>.  After a few seconds, you should see the image, canvas, and video all populate and synchronize.
+        <p>First, run "cacao -p9000 /mjpeg=SOME-MJPEG-URL".  Then:
+            <input type="text" id="url" value="/mjpeg" /><button onclick="go(url.value)">Go</button>.  After a few seconds, you should see the image, canvas, and video all populate and synchronize.
         </p>
         <table>
-            <tr><th>Video</th> <td><video id="video" autoplay playsinline /></td></tr>
+            <tr><th>Video</th> <td><video style="background: black" id="video" autoplay playsinline /></td></tr>
             <tr><th>Image</th> <td><img id="image"/></td></tr>
             <tr><th>Canvas</th> <td><canvas id="canvas"></canvas></td></tr>
         </table>
@@ -16,26 +16,33 @@
     var ctx = canvas.getContext('2d');
 
     var TYPE_JPEG = 'image/jpeg';
-    function go(url) {
+    function go(src) {
         // This function adapted from: https://github.com/aruntj/mjpeg-readable-stream/blob/master/index.html
         // MIT License.
-        fetch(url, {mode: 'cors'})
+        fetch(src, {mode: 'cors'})
         .then(function fetchComplete(response) {
             if (!response.ok) {
-                throw Error(response.status+' '+response.statusText)
+                var reason = response.status+' '+response.statusText;
+                alert('Cannot fetch ' + src + ': ' + reason);
+                throw Error(reason);
             }
             if (!response.body) {
                 alert('ReadableStream not supported.\n' +
                   'If you are using Firefox, go to about:config and set:\n' +
                   'dom.streams.enabled and javascript.options.streams');
-                throw Error('ReadableStream not yet supported in this browser.')
+                throw Error('ReadableStream not yet supported in this browser.');
             }
             
-            var stream = canvas.captureStream();
-            whenStreamIsActive(stream, setSrc);
-            function setSrc() {
-                console.log('setting active video stream');
-                video.srcObject = stream;
+            try {
+                var stream = canvas.captureStream();
+                whenStreamIsActive(stream, setSrc);
+                function setSrc() {
+                    console.log('setting active video stream');
+                    video.srcObject = stream;
+                }
+            }
+            catch (e) {
+                console.error('Cannot captureStream', e);
             }
 
             var reader = response.body.getReader();

@@ -1,3 +1,7 @@
+## 0.3.2
+
+- Prevent caching of HTTP requests.
+
 ## 0.3.1
 
 - Fix HTTP proxy connection leak.

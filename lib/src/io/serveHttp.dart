@@ -6,21 +6,32 @@ Future<void> serveHttp(HttpRequest request, Uri uri) async {
   final targetRequest = await client.openUrl(request.method, uri);
   bool clientClosed = false;
   request.response.done
-    .then((_) => clientClosed = true);
+    .then((_) => clientClosed = true)
+    .catchError((_) => clientClosed = true);
 
   // Add the required headers to the request.
-  request.headers.forEach((hdr, val) =>
-    targetRequest.headers.set(hdr, val));
+  request.headers.forEach((hdr, val) {
+    // print('$hdr: $val');
+    if (hdr.toLowerCase() == 'connection') {
+      val = val.first.toLowerCase() == 'upgrade' ? val : ['close'];
+    }
+    targetRequest.headers.set(hdr, val);
+  });
 
   // Make sure we request the right host.
   targetRequest.headers.set('Host', uri.host);
   await targetRequest.flush();
       
-  // Stream the request.
-  targetRequest
-    ..bufferOutput = false
-    ..addStream(request)
-    .then((_) => targetRequest.close());
+  if (true) {
+    // Stream the request.
+    targetRequest
+      ..bufferOutput = false
+      ..addStream(request)
+      .then((_) => targetRequest.close());
+  }
+  else {
+    targetRequest.close();
+  }
 
   final targetResponse = await targetRequest.done;
 
@@ -39,9 +50,9 @@ Future<void> serveHttp(HttpRequest request, Uri uri) async {
       request.response.headers.contentType = targetResponse.headers.contentType;
 
       // Do the magic: add the allow origin.
-      request.response.headers.remove('X-Content-Type-Options', 'nosniff');
-      request.response.headers.remove('X-Frame-Options', 'SAMEORIGIN');
       request.response.headers.set('Access-Control-Allow-Origin', '*');
+      request.response.headers.set('Cache-Control', 'no-cache');
+      await request.response.flush();
     }
     request.response.add(event);
   }
