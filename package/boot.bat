@@ -4,7 +4,7 @@ REM MIT-style license that can be found in the LICENSE file or at
 REM https://opensource.org/licenses/MIT.
 
 REM This script drives a standalone package, which bundles together a
-REM Dart executable and a snapshot of the packageS. It can be created with `pub run
+REM Dart executable and a snapshot of the package. It can be created with `pub run
 REM grinder package`.
 
 set SCRIPTPATH=%~dp0
