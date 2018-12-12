@@ -10,6 +10,7 @@
             "args": ["-p", "9000",
                 "-h", "0.0.0.0",
                 "../static",
+                // Try opentopia.com to get an MJPEG URL if this doesn't work.
                 "/mjpeg=http://216.8.159.21/mjpg/video.mjpg",
                 "/cam1=http://192.168.100.1/mjpeg",
                 "/cam2=http://192.168.100.2/-wvhttp-01-/video.cgi",
