@@ -8,15 +8,15 @@ environment:
   sdk: '>=2.1.0-dev <3.0.0'
 
 dependencies:
-  args: ^1.5.1
-  mime: ^0.9.6+2
-  path: ^1.6.2
+  args: ^2.4.2
+  mime: ^1.0.4
+  path: ^1.9.1
 
 dev_dependencies:
-  archive: ^2.0.0
-  grinder: ^0.8.0
-  http: ^0.12.0
+  archive: ^3.4.10
+  grinder: ^0.9.4
+  http: ^0.13.6
   meta: ^1.1.0
-  pub_semver: ^1.4.0
-  test: ^1.0.0
-  yaml: ^2.1.0
+  pub_semver: ^2.1.4
+  test: ^1.24.3
+  yaml: ^3.1.2
